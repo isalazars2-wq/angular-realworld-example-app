@@ -41,8 +41,15 @@ jobs:
           chmod +x "$RUNNER_TEMP/chrome-no-sandbox"
           echo "CHROME_BIN=$RUNNER_TEMP/chrome-no-sandbox" >> "$GITHUB_ENV"
 
+      
       - name: Run unit tests with coverage
-        run: npm test -- --watch=false --browsers=ChromeHeadless --code-coverage
+        run: |
+          if find src -type f -name '*.spec.ts' -print -quit | grep -q .; then
+            echo "Unit tests found. Running tests..."
+            npm test -- --watch=false --browsers=ChromeHeadless --code-coverage
+          else
+            echo "No unit tests found in src. Skipping test execution."
+          fi
 
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarqube-scan-action@v8.3.0
